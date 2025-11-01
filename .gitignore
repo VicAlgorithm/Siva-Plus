@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Variables de entorno
+.env
+*.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Carpetas de build
+dist/
+build/
+
+# Editor
+.vscode/
+.idea/
+
+# Temporales
+*.tmp
+*.temp
