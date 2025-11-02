@@ -1,52 +1,53 @@
 # SIVA+ - Plataforma de Streaming
 
-Proyecto de plataforma de streaming tipo Netflix desarrollado desde cero.
+Proyecto de plataforma de streaming tipo Netflix desarrollado con
+HTML, CSS Y JS vanilla
 
 ## Descripción
 
-Sistema completo de gestión de contenido multimedia con:
-- Backend API REST
-- Base de datos relacional
-- Frontend interactivo
-- Panel de administración
+Interfaz de usuario interactiva que simula una plataforma de streaming con:
+- Carrusel de películas animado
+- Miniaturas deslizables
+- Animaciones suaves al cambiar de película
+- Diseño responsive
 
 ## Stack Tecnológico
 
-### Backend
-- Node.js
-- Express.js
-- PostgreSQL
-
-### Frontend
 - HTML5
 - CSS3
 - JavaScript (Vanilla)
 
 ## Estructura del Proyecto
 ```
-SIVA-Plus/
-├── backend/          # Servidor Node.js + Express
-├── frontend/         # Interfaz de usuario
-└── database/         # Scripts SQL
+SIVA-PLUS/
+├── frontend/
+│   ├── css/
+│   │   └── style.css
+│   ├── scripts/
+│   │   └── inicio.js
+│   └── index.html
+├── backend/          (En desarrollo)
+└── database/         (Próximamente)
 ```
 
-## Instalación (próximamente)
+## Como usar
 
-Instrucciones de instalación se agregarán conforme se desarrolle el proyecto.
+1. Clona el repositorio
+2. Abre `frontend/index.html` en tu navegador
+3. Disfruta explorando las películas
 
 ## Progreso
 
-- [ ] Configuración inicial
-- [ ] Backend básico
-- [ ] Base de datos
-- [ ] Frontend básico
-- [ ] Integración completa
+- [ ] Backend con Node.js + Express
+- [ ] Base de datos PostgreSQL
 - [ ] Panel de administración
+- [ ] Sistema de usuarios
+- [ ] Subida de archivos
 
 ##  Autor
 
-Vic M.
+Victor Mejia
 
 ## Fecha de Inicio
 
-Noviembre 2025
+01 Noviembre 2025
