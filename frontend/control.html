@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <title>Control_SIVA</title>
+        <link rel="stylesheet" href="css/styleControl.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+    <body>
+        
+        <div id="loading-screen">
+            <h2>CONTROL SIVA+</h2>
+        </div>
+
+        <div class="sidebar">
+
+            <ul>
+                <li class="a">
+                    <a href="index.html" class="logo">
+                        <span class="icono"><ion-icon name="grid-outline"></ion-icon></span>
+                        <span class="texto">SIVA+</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-seccion="agregar-contenido">
+                        <span class="icono"><ion-icon name="add-circle-outline"></ion-icon></span>
+                        <span class="texto">Agregar Contenido</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-seccion="ver-contenido">
+                        <span class="icono"><ion-icon name="eye-outline"></ion-icon></span>
+                        <span class="texto">Ver Contenido</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-seccion="papelera">
+                        <span class="icono"><ion-icon name="trash-outline"></ion-icon></span>
+                        <span class="texto">Papelera</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-seccion="usuarios">
+                        <span class="icono"><ion-icon name="people-outline"></ion-icon></span>
+                        <span class="texto">Usuarios</span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+
+
+
+        <div class="principal">
+
+            <section id="agregar-contenido" class="section">
+
+                <h1>Agregar Nueva Pelicula</h1>
+
+                <form id="form-agregar" class="formulario">
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" name="titulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Director *</label>
+                        <input type="text" name="director" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sinopsis *</label>
+                        <textarea name="sinopsis" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>URL de Imagen</label>
+                        <input type="text" name="imagen_url" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Año</label>
+                            <input type="number" name="anio" min="1900" max="2030">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select name="id_seriepeli" id="select-tipo" required>
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Género</label>
+                        <select name="id_genero" id="select-genero" required>
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Agregar Contenido</button>
+                        <button type="button" class="btn-secondary" onclick="cancelarAgregar()">Cancelar</button>
+                    </div>
+                </form>
+
+            </section>
+
+
+            <section id="ver-contenido" class="section">
+
+                <h1>Películas</h1>
+
+                <div class="barra-busqueda">
+                    <input type="text" id="input-buscar" placeholder="Buscar película por título, director o género...">
+                </div>
+                
+                <div id="grid-peliculas" class="grid-peliculas"></div>
+
+            </section>
+
+            <section id="papelera" class="section">
+                <h1>Papelera</h1>
+                <div class="mensaje-info">
+                    Funcionalidad próximamente...
+                </div>
+            </section>
+
+            <section id="usuarios" class="section">
+                <h1>Usuarios Registrados</h1>
+
+                <div class="barra-busqueda">
+                    <input type="text" id="input-buscar-usuarios" placeholder="Buscar usuario por nombre, correo o teléfono...">
+                </div>
+
+                <div class="tabla-container">
+                    <table id="tabla-usuarios">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Teléfono</th>
+                                <th>Plan</th>
+                                <th>Fecha Registro</th>
+                                <th>Favoritos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-usuarios">
+                            <!-- Los usuarios se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <div id="modal-editar" class="modal">
+                <div class="modal-contenido">
+                    <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
+                    <h2>Editar Película</h2>
+                    <form id="form-editar" class="formulario">
+                        <input type="hidden" name="id" id="edit-id">
+                        <div class="form-group">
+                            <label>Título *</label>
+                            <input type="text" name="titulo" id="edit-titulo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Director *</label>
+                            <input type="text" name="director" id="edit-director" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sinopsis *</label>
+                            <textarea name="sinopsis" id="edit-sinopsis" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>URL de Imagen</label>
+                            <input type="text" name="imagen_url" id="edit-imagen_url">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Año</label>
+                                <input type="number" name="anio" id="edit-anio" min="1900" max="2030">
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo</label>
+                                <select name="id_seriepeli" id="edit-tipo" required>
+                                    <option value="">Seleccionar...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Género</label>
+                            <select name="id_genero" id="edit-genero" required>
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="btn-primary">Guardar Cambios</button>
+                            <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+        <script src="scripts/control.js"></script> 
+    </body>
+
+
+</html>
