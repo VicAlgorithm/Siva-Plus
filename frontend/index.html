@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <title>SIVA+</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    </head>
+
+    <body>
+
+        <div id="loading_screen">
+            <h2><span class="g">SIVA</span><span class="w">+</span></h2>
+        </div>
+
+        <header>
+
+            <nav>
+
+                <h1><a href="index.html"><span class="g g1">SIVA</span><span class="w w1">+</span></a></h1>
+
+                <ul class="menu">
+                    <li><a href="#" data-seccion="seccion-inicio" class="nav-activo">Inicio</a></li>
+                    <li><a href="#" data-seccion="seccion-peliculas">Peliculas</a></li>
+                    <li><a href="#" data-seccion="seccion-series">Series</a></li>
+                    <li><a href="#" data-seccion="seccion-favoritos" class="require-login nav-favoritos">Favoritos</a></li>
+                </ul>
+
+                <div class="menu_icon">
+                    <a href="#" id="btn-search"><i class="bi bi-search"></i></a>
+                    <div class="notificaciones-container">
+                        <a href="#" class="require-login" id="btn-notificaciones">
+                            <i class="bi bi-bell"></i>
+                            <span class="notif-badge" id="notif-badge" style="display: none;">0</span>
+                        </a>
+                    </div>
+                    <a href="#" class="user_icon" id="btn-user-icon"><i class="bi bi-person-circle" id="icon-user"></i></a>
+                </div>
+
+            </nav>
+
+            <!-- Barra de búsqueda desplegable -->
+            <div id="search-bar" class="search-bar">
+                <div class="search-bar-content">
+                    <input type="text" id="input-search" placeholder="Buscar películas o series...">
+                    <button id="btn-close-search" class="btn-close-search">&times;</button>
+                </div>
+            </div>
+
+        </header>
+
+        <main>
+
+            <!-- SECCIÓN INICIO (Todas las películas/series) -->
+            <section id="seccion-inicio" class="seccion-contenido activa">
+                <div class="main">
+                    <div class="mainMovie" id="mainMovie-inicio"></div>
+                    <div class="bar" id="bar-inicio"></div>
+
+                    <!-- Controles: Géneros + Flechas -->
+                    <div class="controles-generales">
+                        <div class="generos-container">
+                            <button class="btn-abrir-generos-general" id="btn-abrir-generos-inicio">
+                                <span id="genero-actual-texto-inicio">Todas las Películas</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <div class="generos-dropdown-general" id="generos-dropdown-inicio">
+                                <button class="genero-item activo" data-genero="todos">Todos</button>
+                            </div>
+                        </div>
+                        <div class="flechas">
+                            <button class="btn-prev" data-seccion="inicio">&lt;</button>
+                            <button class="btn-next" data-seccion="inicio">&gt;</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN PELÍCULAS (Solo id_seriepeli = 1) -->
+            <section id="seccion-peliculas" class="seccion-contenido">
+                <div class="main">
+                    <div class="mainMovie" id="mainMovie-peliculas"></div>
+                    <div class="bar" id="bar-peliculas"></div>
+
+                    <!-- Controles: Géneros + Flechas -->
+                    <div class="controles-generales">
+                        <div class="generos-container">
+                            <button class="btn-abrir-generos-general" id="btn-abrir-generos-peliculas">
+                                <span id="genero-actual-texto-peliculas">Todas las Películas</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <div class="generos-dropdown-general" id="generos-dropdown-peliculas">
+                                <button class="genero-item activo" data-genero="todos">Todos</button>
+                            </div>
+                        </div>
+                        <div class="flechas">
+                            <button class="btn-prev" data-seccion="peliculas">&lt;</button>
+                            <button class="btn-next" data-seccion="peliculas">&gt;</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN SERIES (Solo id_seriepeli = 2) -->
+            <section id="seccion-series" class="seccion-contenido">
+                <div class="main">
+                    <div class="mainMovie" id="mainMovie-series"></div>
+                    <div class="bar" id="bar-series"></div>
+
+                    <!-- Controles: Géneros + Flechas -->
+                    <div class="controles-generales">
+                        <div class="generos-container">
+                            <button class="btn-abrir-generos-general" id="btn-abrir-generos-series">
+                                <span id="genero-actual-texto-series">Todas las Series</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <div class="generos-dropdown-general" id="generos-dropdown-series">
+                                <button class="genero-item activo" data-genero="todos">Todos</button>
+                            </div>
+                        </div>
+                        <div class="flechas">
+                            <button class="btn-prev" data-seccion="series">&lt;</button>
+                            <button class="btn-next" data-seccion="series">&gt;</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN FAVORITOS -->
+            <section id="seccion-favoritos" class="seccion-contenido">
+                <div class="main">
+                    <div class="mainMovie" id="mainMovie-favoritos"></div>
+                    <div class="bar" id="bar-favoritos"></div>
+
+                    <!-- Controles: Géneros + Flechas -->
+                    <div class="controles-generales">
+                        <div class="generos-container">
+                            <button class="btn-abrir-generos-general" id="btn-abrir-generos-favoritos">
+                                <span id="genero-actual-texto-favoritos">Todos los Favoritos</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <div class="generos-dropdown-general" id="generos-dropdown-favoritos">
+                                <button class="genero-item activo" data-genero="todos">Todos</button>
+                            </div>
+                        </div>
+                        <div class="flechas">
+                            <button class="btn-prev" data-seccion="favoritos">&lt;</button>
+                            <button class="btn-next" data-seccion="favoritos">&gt;</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN BÚSQUEDA -->
+            <section id="seccion-busqueda" class="seccion-contenido">
+                <div class="main">
+                    <div class="mainMovie" id="mainMovie-busqueda"></div>
+                    <div class="bar" id="bar-busqueda"></div>
+
+                    <!-- Controles: Géneros + Flechas -->
+                    <div class="controles-generales">
+                        <div class="generos-container">
+                            <button class="btn-abrir-generos-general" id="btn-abrir-generos-busqueda">
+                                <span id="genero-actual-texto-busqueda">Resultados de Búsqueda</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <div class="generos-dropdown-general" id="generos-dropdown-busqueda">
+                                <button class="genero-item activo" data-genero="todos">Todos</button>
+                            </div>
+                        </div>
+                        <div class="flechas">
+                            <button class="btn-prev" data-seccion="busqueda">&lt;</button>
+                            <button class="btn-next" data-seccion="busqueda">&gt;</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Modal de Login -->
+        <div id="modal-login" class="modal-overlay">
+            <div class="modal-login-container">
+                <button class="modal-close">&times;</button>
+                <h2 id="modal-titulo">Bienvenido a SIVA+</h2>
+
+                <!-- Formulario de Login -->
+                <form id="form-login" class="form-auth">
+                    <div class="form-group">
+                        <label for="telefono-login">Número telefónico</label>
+                        <input type="tel" id="telefono-login" name="telefono" placeholder="555-123-4567" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password-login">Contraseña</label>
+                        <input type="password" id="password-login" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="botones-auth">
+                        <button type="submit" class="btn-auth btn-login">Login</button>
+                        <span class="separador">o</span>
+                        <button type="button" class="btn-auth btn-registrar" id="btn-mostrar-registro">Registrarse</button>
+                    </div>
+                </form>
+
+                <!-- Formulario de Registro (oculto inicialmente) -->
+                <form id="form-registro" class="form-auth" style="display: none;">
+                    <div class="form-group">
+                        <label for="nombre">Nombre personalizado</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ej: JuanCine123" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="correo">Correo electrónico</label>
+                        <input type="email" id="correo" name="correo" placeholder="tucorreo@ejemplo.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono-registro">Número telefónico</label>
+                        <input type="tel" id="telefono-registro" name="telefono" placeholder="555-123-4567" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password-registro">Contraseña</label>
+                        <input type="password" id="password-registro" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="botones-auth">
+                        <button type="submit" class="btn-auth btn-login">Registrarse</button>
+                        <button type="button" class="btn-auth btn-registrar" id="btn-volver-login">Volver a Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar de usuario -->
+        <div id="user-sidebar" class="user-sidebar">
+            <div class="user-sidebar-content">
+                <div class="user-info">
+                    <i class="bi bi-emoji-smile"></i>
+                    <div class="user-details">
+                        <span id="user-sidebar-nombre">Nombre Usuario</span>
+                        <span id="user-sidebar-plan">Plan Básico</span>
+                    </div>
+                </div>
+                <ul class="user-menu">
+                    <li><a href="#"><i class="bi bi-person"></i> Perfil</a></li>
+                    <li><a href="#"><i class="bi bi-star"></i> Plan</a></li>
+                    <li><a href="#"><i class="bi bi-credit-card"></i> Métodos de Pago</a></li>
+                    <li><a href="#" id="btn-logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Dropdown de notificaciones -->
+        <div id="notificaciones-dropdown" class="notificaciones-dropdown">
+            <div class="notificaciones-header">
+                <h3>Notificaciones</h3>
+                <button class="btn-marcar-leidas" id="btn-marcar-todas-leidas">Marcar todas como leídas</button>
+            </div>
+            <div class="notificaciones-lista" id="notificaciones-lista">
+                <!-- Las notificaciones se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+
+        <script src="scripts/inicio.js"></script>
+    </body>
+
+
+</html>
