@@ -1,0 +1,865 @@
+/* ====================================
+   ESTILOS PARA PLANES Y MEMBRESÍAS
+   ==================================== */
+
+/* Modal de Planes */
+.modal-planes-container,
+.modal-metodos-container {
+    background-color: rgb(31, 31, 31);
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    animation: modalAppear 0.3s ease;
+}
+
+/* Grid de Planes */
+.planes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.subtitulo-planes {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
+}
+
+/* Card de Plan */
+.plan-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-card:hover {
+    transform: translateY(-10px);
+    border-color: rgb(7, 136, 39);
+    box-shadow: 0 10px 30px rgba(7, 136, 39, 0.3);
+}
+
+.plan-card.plan-destacado {
+    border-color: rgb(255, 187, 0);
+    background: linear-gradient(145deg, rgba(255, 187, 0, 0.1), rgba(255, 187, 0, 0.05));
+}
+
+.badge-popular {
+    position: absolute;
+    top: 20px;
+    right: -30px;
+    background: rgb(255, 187, 0);
+    color: black;
+    padding: 5px 40px;
+    transform: rotate(45deg);
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.plan-card h3 {
+    color: rgb(255, 187, 0);
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.descripcion-plan {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.precio-plan {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 30px;
+}
+
+.precio-plan .simbolo {
+    color: white;
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.precio-plan .cantidad {
+    color: rgb(7, 136, 39);
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.precio-plan .periodo {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+.caracteristicas-lista {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+}
+
+.caracteristicas-lista li {
+    color: white;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.caracteristicas-lista li:last-child {
+    border-bottom: none;
+}
+
+.caracteristicas-lista i {
+    color: rgb(7, 136, 39);
+    font-size: 18px;
+}
+
+.btn-seleccionar-plan {
+    width: 100%;
+    padding: 15px;
+    background: rgb(7, 136, 39);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-seleccionar-plan:hover {
+    background: rgb(5, 110, 31);
+    transform: scale(1.05);
+}
+
+/* Suscripción Activa */
+.suscripcion-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 30px;
+    margin-top: 20px;
+}
+
+.plan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgb(255, 187, 0);
+    color: black;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.plan-badge i {
+    font-size: 24px;
+}
+
+.detalles-suscripcion {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+.detalles-suscripcion p {
+    color: white;
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.detalles-suscripcion strong {
+    color: rgb(255, 187, 0);
+}
+
+.caracteristicas-plan {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.caracteristicas-plan li {
+    color: white;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.caracteristicas-plan i {
+    color: rgb(7, 136, 39);
+}
+
+.acciones-suscripcion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Switch de Auto-renovación */
+.switch-renovacion {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+}
+
+.switch-renovacion input {
+    display: none;
+}
+
+.slider-renovacion {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 34px;
+    transition: 0.4s;
+}
+
+.slider-renovacion:before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+.switch-renovacion input:checked + .slider-renovacion {
+    background-color: rgb(7, 136, 39);
+}
+
+.switch-renovacion input:checked + .slider-renovacion:before {
+    transform: translateX(24px);
+}
+
+.label-renovacion {
+    color: white;
+    font-size: 16px;
+}
+
+.btn-cancelar-suscripcion {
+    padding: 12px 24px;
+    background: transparent;
+    color: #ff4444;
+    border: 2px solid #ff4444;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-cancelar-suscripcion:hover {
+    background: rgba(255, 68, 68, 0.1);
+    transform: scale(1.05);
+}
+
+.btn-mejorar-premium {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, rgb(255, 187, 0), rgb(255, 140, 0));
+    color: black;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(255, 187, 0, 0.4);
+    width: 100%;
+}
+
+.btn-mejorar-premium:hover {
+    background: linear-gradient(135deg, rgb(255, 200, 0), rgb(255, 160, 0));
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 187, 0, 0.6);
+}
+
+.btn-mejorar-premium i {
+    font-size: 20px;
+}
+
+/* ====================================
+   MÉTODOS DE PAGO
+   ==================================== */
+
+.metodos-lista {
+    margin: 30px 0;
+}
+
+.sin-metodos {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 40px;
+    font-size: 16px;
+}
+
+.metodo-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.metodo-item:hover {
+    border-color: rgb(7, 136, 39);
+    background: rgba(7, 136, 39, 0.05);
+}
+
+.metodo-item.metodo-principal {
+    border-color: rgb(255, 187, 0);
+    background: rgba(255, 187, 0, 0.05);
+}
+
+.metodo-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.metodo-info i {
+    font-size: 32px;
+    color: rgb(7, 136, 39);
+}
+
+.metodo-detalles {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.metodo-detalles strong {
+    color: white;
+    font-size: 16px;
+}
+
+.metodo-detalles span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+.metodo-acciones {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.badge-principal {
+    background: rgb(255, 187, 0);
+    color: black;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-marcar-principal {
+    background: transparent;
+    color: rgb(7, 136, 39);
+    border: 2px solid rgb(7, 136, 39);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-marcar-principal:hover {
+    background: rgba(7, 136, 39, 0.1);
+}
+
+.btn-eliminar-metodo {
+    background: transparent;
+    color: #ff4444;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-eliminar-metodo:hover {
+    transform: scale(1.2);
+    color: #ff6666;
+}
+
+.btn-agregar-metodo {
+    width: 100%;
+    padding: 15px;
+    background: rgb(7, 136, 39);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-agregar-metodo:hover {
+    background: rgb(5, 110, 31);
+    transform: scale(1.02);
+}
+
+/* Formulario de Método de Pago */
+.formulario-metodo-pago {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 30px;
+    margin-top: 20px;
+}
+
+.formulario-metodo-pago h3 {
+    color: rgb(255, 187, 0);
+    margin-bottom: 20px;
+}
+
+.formulario-metodo-pago .form-group {
+    margin-bottom: 20px;
+}
+
+.formulario-metodo-pago label {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.formulario-metodo-pago input,
+.formulario-metodo-pago select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.formulario-metodo-pago input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.formulario-metodo-pago input:focus,
+.formulario-metodo-pago select:focus {
+    outline: none;
+    border-color: rgb(255, 187, 0);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+}
+
+.botones-metodo {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-guardar-metodo,
+.btn-cancelar-metodo {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-guardar-metodo {
+    background-color: rgb(7, 136, 39);
+    color: white;
+}
+
+.btn-guardar-metodo:hover {
+    background-color: rgb(5, 110, 31);
+}
+
+.btn-cancelar-metodo {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.btn-cancelar-metodo:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ====================================
+   MODALES PERSONALIZADOS
+   ==================================== */
+
+.modal-custom-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-custom-container {
+    background: rgb(31, 31, 31);
+    border-radius: 20px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-custom-container.modal-seleccion {
+    max-width: 700px;
+}
+
+.modal-custom-header {
+    padding: 30px 30px 20px 30px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-custom-header h2 {
+    color: rgb(255, 187, 0);
+    font-size: 24px;
+    margin: 0;
+}
+
+.btn-cerrar-modal-custom {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.btn-cerrar-modal-custom:hover {
+    color: rgb(255, 187, 0);
+}
+
+.modal-custom-body {
+    padding: 30px;
+    color: white;
+}
+
+.modal-custom-body p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.subtitulo-modal {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    margin-bottom: 20px !important;
+}
+
+.modal-custom-footer {
+    padding: 20px 30px 30px 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Botones de modales */
+.btn-modal-aceptar,
+.btn-modal-confirmar {
+    padding: 12px 30px;
+    background: rgb(7, 136, 39);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-modal-aceptar:hover,
+.btn-modal-confirmar:hover {
+    background: rgb(5, 110, 31);
+    transform: scale(1.05);
+}
+
+.btn-modal-cancelar {
+    padding: 12px 30px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-modal-cancelar:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Modal de éxito */
+.modal-exito .icono-exito {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal-exito .icono-exito i {
+    font-size: 64px;
+    color: rgb(7, 136, 39);
+}
+
+/* Resumen de compra */
+.resumen-compra {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.detalle-compra {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detalle-compra:last-child {
+    border-bottom: none;
+}
+
+.detalle-compra i {
+    font-size: 24px;
+    color: rgb(255, 187, 0);
+}
+
+.detalle-compra span {
+    font-size: 16px;
+    color: white;
+}
+
+/* Opciones de métodos de pago */
+.metodo-opcion {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.metodo-opcion:hover {
+    border-color: rgb(7, 136, 39);
+    background: rgba(7, 136, 39, 0.1);
+}
+
+.metodo-opcion.metodo-nuevo {
+    border-style: dashed;
+}
+
+.metodo-opcion.metodo-nuevo:hover {
+    border-color: rgb(255, 187, 0);
+    background: rgba(255, 187, 0, 0.1);
+}
+
+.metodo-icono {
+    font-size: 32px;
+    color: rgb(7, 136, 39);
+}
+
+.metodo-nuevo .metodo-icono {
+    color: rgb(255, 187, 0);
+}
+
+.metodo-datos {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.metodo-datos strong {
+    color: white;
+    font-size: 16px;
+}
+
+.metodo-datos span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+.badge-principal-small {
+    background: rgb(255, 187, 0);
+    color: black;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.btn-seleccionar-metodo {
+    padding: 10px 20px;
+    background: rgb(7, 136, 39);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-seleccionar-metodo:hover {
+    background: rgb(5, 110, 31);
+    transform: scale(1.05);
+}
+
+.metodo-nuevo .btn-seleccionar-metodo {
+    background: rgb(255, 187, 0);
+    color: black;
+}
+
+.metodo-nuevo .btn-seleccionar-metodo:hover {
+    background: rgb(255, 200, 0);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .planes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .acciones-suscripcion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .metodo-item {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .metodo-acciones {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .botones-metodo {
+        flex-direction: column;
+    }
+
+    .modal-custom-container {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .metodo-opcion {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-seleccionar-metodo {
+        width: 100%;
+    }
+
+    .modal-custom-footer {
+        flex-direction: column;
+    }
+
+    .btn-modal-aceptar,
+    .btn-modal-confirmar,
+    .btn-modal-cancelar {
+        width: 100%;
+    }
+}

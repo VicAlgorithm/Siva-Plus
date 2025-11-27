@@ -82,7 +82,7 @@ async function generarImagenesPrincipales(peliculas, contenedorId) {
                     <div class="autor">${pelicula.director}</div>
                     <div class="sinopsis">${pelicula.sinopsis}</div>
                     <div class="botones_peli">
-                        <button class="btn-reproducir require-login" data-contenido-url="${pelicula.contenido_url || ''}">Reproducir</button>
+                        <button class="btn-reproducir require-login" data-contenido-url="${pelicula.contenido_url || ''}" data-premium="${pelicula.premium || false}">Reproducir</button>
                         <button class="btn-mi-lista require-login" data-pelicula-id="${pelicula.id_pelicula}">${textoBoton}</button>
                     </div>
                 </div>
@@ -101,6 +101,7 @@ function generarMiniaturas(peliculas, contenedorId, seccion) {
     peliculas.forEach((pelicula, indice) => {
         const itemHTML = `
             <div class="item1" data-indice="${indice}" data-seccion="${seccion}">
+                ${pelicula.premium ? '<span class="badge-premium-miniatura"><i class="bi bi-star-fill"></i></span>' : ''}
                 <img src="${pelicula.imagen_url}" alt="${pelicula.titulo}">
                 <div class="contenido1">
                     <div class="titulo">${pelicula.titulo}</div>
@@ -198,15 +199,8 @@ async function inicializarSeccion(seccion) {
 
     console.log(`✅ Sección ${seccion} cargada correctamente`);
 
-    // Si es la sección de películas, generar botones de géneros
-    if (seccion === 'peliculas') {
-        generarBotonesGeneros(peliculas);
-    }
-
-    // Si es la sección de series, generar botones de géneros
-    if (seccion === 'series') {
-        generarBotonesGenerosSeries(peliculas);
-    }
+    // Generar botones de géneros para todas las secciones
+    generarBotonesGenerosUnificado(seccion, peliculas);
 }
 
 // ====================================
@@ -756,7 +750,7 @@ const originalManejarAccesoProtegido = manejarAccesoProtegido;
 function manejarAccesoProtegido(e) {
     const elementoProtegido = e.target.closest('.require-login');
 
-    // Si es el botón de Reproducir, redirigir al contenido
+    // Si es el botón de Reproducir, abrir reproductor
     if (elementoProtegido && elementoProtegido.classList.contains('btn-reproducir')) {
         e.preventDefault();
         e.stopPropagation();
@@ -767,14 +761,50 @@ function manejarAccesoProtegido(e) {
             modalLogin.classList.add('active');
             mostrarFormularioLogin();
         } else {
-            // Obtener la URL del contenido
-            const contenidoUrl = elementoProtegido.getAttribute('data-contenido-url');
+            // Verificar si el contenido es premium
+            const esPremium = elementoProtegido.getAttribute('data-premium') === 'true';
 
-            if (contenidoUrl && contenidoUrl.trim() !== '') {
-                // Redirigir a la URL del contenido en una nueva pestaña
-                window.open(contenidoUrl, '_blank');
+            if (esPremium) {
+                // Verificar si el usuario tiene plan premium
+                const usuario = JSON.parse(usuarioLogueado);
+
+                // Verificar suscripción activa
+                fetch(`http://localhost:3000/api/suscripciones/usuario/${usuario.id_usuario}`)
+                    .then(res => res.json())
+                    .then(async datos => {
+                        if (datos.success && datos.tiene_suscripcion && datos.suscripcion) {
+                            // Usuario tiene plan premium activo, puede reproducir
+                            const contenidoUrl = elementoProtegido.getAttribute('data-contenido-url');
+
+                            if (contenidoUrl && contenidoUrl.trim() !== '') {
+                                abrirReproductor(contenidoUrl);
+                            } else {
+                                alert('Esta película no tiene contenido disponible');
+                            }
+                        } else {
+                            // Usuario tiene plan básico, mostrar modal de planes
+                            const modalPlanes = document.getElementById('modal-planes');
+                            if (modalPlanes && typeof verificarSuscripcionActiva === 'function') {
+                                await verificarSuscripcionActiva(usuario.id_usuario);
+                                modalPlanes.classList.add('active');
+                                document.body.style.overflow = 'hidden';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al verificar suscripción:', error);
+                        alert('Error al verificar tu plan. Intenta de nuevo.');
+                    });
             } else {
-                alert('Esta película no tiene contenido disponible');
+                // Contenido gratuito, reproducir directamente
+                const contenidoUrl = elementoProtegido.getAttribute('data-contenido-url');
+
+                if (contenidoUrl && contenidoUrl.trim() !== '') {
+                    // Abrir reproductor en modal
+                    abrirReproductor(contenidoUrl);
+                } else {
+                    alert('Esta película no tiene contenido disponible');
+                }
             }
         }
         return;
@@ -1196,203 +1226,506 @@ function volverDeBusqueda() {
 }
 
 // ====================================
-// SISTEMA DE FILTRADO POR GÉNEROS
+// SISTEMA DE FILTRADO POR GÉNEROS UNIFICADO
 // ====================================
 
-const btnAbrirGeneros = document.getElementById('btn-abrir-generos');
-const generosDropdown = document.getElementById('generos-dropdown');
-const generoActualTexto = document.getElementById('genero-actual-texto');
-
-// Toggle dropdown de géneros
-btnAbrirGeneros.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    generosDropdown.classList.toggle('active');
-    btnAbrirGeneros.classList.toggle('active');
-});
-
-// Cerrar dropdown al hacer click fuera
+// Delegación de eventos para TODOS los botones de género
 document.addEventListener('click', (e) => {
-    if (!generosDropdown.contains(e.target) && !btnAbrirGeneros.contains(e.target)) {
-        generosDropdown.classList.remove('active');
-        btnAbrirGeneros.classList.remove('active');
+    // Abrir/cerrar dropdown
+    if (e.target.closest('.btn-abrir-generos-general')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const boton = e.target.closest('.btn-abrir-generos-general');
+        const dropdown = boton.parentElement.querySelector('.generos-dropdown-general');
+
+        // Cerrar todos los otros dropdowns
+        document.querySelectorAll('.generos-dropdown-general').forEach(d => {
+            if (d !== dropdown) {
+                d.classList.remove('active');
+            }
+        });
+
+        document.querySelectorAll('.btn-abrir-generos-general').forEach(b => {
+            if (b !== boton) {
+                b.classList.remove('active');
+            }
+        });
+
+        // Toggle el dropdown actual
+        dropdown.classList.toggle('active');
+        boton.classList.toggle('active');
+        return;
+    }
+
+    // Filtrar por género
+    if (e.target.classList.contains('genero-item')) {
+        const generoSeleccionado = e.target.getAttribute('data-genero');
+        const textoGenero = e.target.textContent;
+
+        // Determinar en qué sección estamos
+        const seccionActiva = document.querySelector('.seccion-contenido.activa');
+        if (!seccionActiva) return;
+
+        const seccion = seccionActiva.id.replace('seccion-', '');
+
+        // Filtrar por género
+        filtrarPorGeneroUnificado(seccion, generoSeleccionado, textoGenero);
+
+        // Actualizar botones activos en el dropdown correspondiente
+        const dropdown = e.target.closest('.generos-dropdown-general');
+        dropdown.querySelectorAll('.genero-item').forEach(b => b.classList.remove('activo'));
+        e.target.classList.add('activo');
+
+        // Cerrar el dropdown
+        dropdown.classList.remove('active');
+        dropdown.parentElement.querySelector('.btn-abrir-generos-general').classList.remove('active');
+        return;
+    }
+
+    // Cerrar dropdowns al hacer click fuera
+    if (!e.target.closest('.generos-container')) {
+        document.querySelectorAll('.generos-dropdown-general').forEach(d => {
+            d.classList.remove('active');
+        });
+        document.querySelectorAll('.btn-abrir-generos-general').forEach(b => {
+            b.classList.remove('active');
+        });
     }
 });
 
-// Función para generar botones de géneros
-function generarBotonesGeneros(peliculas) {
-    const dropdown = document.getElementById('generos-dropdown');
+// Función para generar botones de géneros de forma unificada
+function generarBotonesGenerosUnificado(seccion, contenido) {
+    const dropdown = document.getElementById(`generos-dropdown-${seccion}`);
     if (!dropdown) return;
 
-    // Extraer géneros únicos de las películas
+    // Extraer géneros únicos
     const generosSet = new Set();
-    peliculas.forEach(pelicula => {
-        if (pelicula.genero) {
-            // Si hay múltiples géneros separados por comas, dividirlos
-            const generos = pelicula.genero.split(',').map(g => g.trim());
+    contenido.forEach(item => {
+        if (item.genero) {
+            const generos = item.genero.split(',').map(g => g.trim());
             generos.forEach(genero => generosSet.add(genero));
         }
     });
 
-    // Convertir Set a Array y ordenar alfabéticamente
+    // Convertir a array y ordenar
     const generosArray = Array.from(generosSet).sort();
 
-    // Limpiar el dropdown (excepto el botón "Todos")
+    // Limpiar y agregar botón "Todos"
     dropdown.innerHTML = '<button class="genero-item activo" data-genero="todos">Todos</button>';
 
-    // Agregar botones para cada género
+    // Agregar botones de géneros
     generosArray.forEach(genero => {
         const botonHTML = `<button class="genero-item" data-genero="${genero}">${genero}</button>`;
         dropdown.innerHTML += botonHTML;
     });
-
-    // Agregar eventos a los botones
-    const botones = dropdown.querySelectorAll('.genero-item');
-    botones.forEach(boton => {
-        boton.addEventListener('click', () => {
-            const generoSeleccionado = boton.getAttribute('data-genero');
-            const textoGenero = boton.textContent;
-
-            filtrarPorGenero(generoSeleccionado, textoGenero);
-
-            // Actualizar botón activo
-            botones.forEach(b => b.classList.remove('activo'));
-            boton.classList.add('activo');
-
-            // Cerrar el dropdown
-            generosDropdown.classList.remove('active');
-            btnAbrirGeneros.classList.remove('active');
-        });
-    });
 }
 
-// Función para filtrar películas por género
-async function filtrarPorGenero(genero, textoGenero) {
-    const todasLasPeliculas = secciones.peliculas.peliculas;
+// Función para filtrar por género de forma unificada
+async function filtrarPorGeneroUnificado(seccion, genero, textoGenero) {
+    const contenidoCompleto = secciones[seccion].peliculas;
+    const botonTexto = document.getElementById(`genero-actual-texto-${seccion}`);
 
-    let peliculasFiltradas;
+    if (!contenidoCompleto || !botonTexto) return;
+
+    let contenidoFiltrado;
 
     if (genero === 'todos') {
-        peliculasFiltradas = todasLasPeliculas;
-        generoActualTexto.textContent = 'Todas las Películas';
-    } else {
-        peliculasFiltradas = todasLasPeliculas.filter(pelicula => {
-            if (!pelicula.genero) return false;
-            // Verificar si el género está en la lista (para películas con múltiples géneros)
-            const generos = pelicula.genero.split(',').map(g => g.trim());
-            return generos.includes(genero);
-        });
-        generoActualTexto.textContent = textoGenero;
-    }
-
-    // Regenerar el carrusel con las películas filtradas
-    await generarImagenesPrincipales(peliculasFiltradas, 'mainMovie-peliculas');
-    generarMiniaturas(peliculasFiltradas, 'bar-peliculas', 'peliculas');
-
-    // Mostrar la primera película
-    setTimeout(() => {
-        cambiarImagenPrincipal(0, 'peliculas');
-    }, 100);
-}
-
-// ====================================
-// SISTEMA DE FILTRADO POR GÉNEROS PARA SERIES
-// ====================================
-
-const btnAbrirGenerosSeries = document.getElementById('btn-abrir-generos-series');
-const generosDropdownSeries = document.getElementById('generos-dropdown-series');
-const generoActualTextoSeries = document.getElementById('genero-actual-texto-series');
-
-// Toggle dropdown de géneros para series
-btnAbrirGenerosSeries.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    generosDropdownSeries.classList.toggle('active');
-    btnAbrirGenerosSeries.classList.toggle('active');
-});
-
-// Cerrar dropdown al hacer click fuera
-document.addEventListener('click', (e) => {
-    if (!generosDropdownSeries.contains(e.target) && !btnAbrirGenerosSeries.contains(e.target)) {
-        generosDropdownSeries.classList.remove('active');
-        btnAbrirGenerosSeries.classList.remove('active');
-    }
-});
-
-// Función para generar botones de géneros para series
-function generarBotonesGenerosSeries(series) {
-    const dropdown = document.getElementById('generos-dropdown-series');
-    if (!dropdown) return;
-
-    // Extraer géneros únicos de las series
-    const generosSet = new Set();
-    series.forEach(serie => {
-        if (serie.genero) {
-            // Si hay múltiples géneros separados por comas, dividirlos
-            const generos = serie.genero.split(',').map(g => g.trim());
-            generos.forEach(genero => generosSet.add(genero));
+        contenidoFiltrado = contenidoCompleto;
+        // Actualizar texto según la sección
+        if (seccion === 'peliculas') {
+            botonTexto.textContent = 'Todas las Películas';
+        } else if (seccion === 'series') {
+            botonTexto.textContent = 'Todas las Series';
+        } else if (seccion === 'inicio') {
+            botonTexto.textContent = 'Todo el Contenido';
+        } else if (seccion === 'favoritos') {
+            botonTexto.textContent = 'Todos los Favoritos';
+        } else if (seccion === 'busqueda') {
+            botonTexto.textContent = 'Todos los Resultados';
         }
-    });
-
-    // Convertir Set a Array y ordenar alfabéticamente
-    const generosArray = Array.from(generosSet).sort();
-
-    // Limpiar el dropdown (excepto el botón "Todos")
-    dropdown.innerHTML = '<button class="genero-item activo" data-genero="todos">Todos</button>';
-
-    // Agregar botones para cada género
-    generosArray.forEach(genero => {
-        const botonHTML = `<button class="genero-item" data-genero="${genero}">${genero}</button>`;
-        dropdown.innerHTML += botonHTML;
-    });
-
-    // Agregar eventos a los botones
-    const botones = dropdown.querySelectorAll('.genero-item');
-    botones.forEach(boton => {
-        boton.addEventListener('click', () => {
-            const generoSeleccionado = boton.getAttribute('data-genero');
-            const textoGenero = boton.textContent;
-
-            filtrarPorGeneroSeries(generoSeleccionado, textoGenero);
-
-            // Actualizar botón activo
-            botones.forEach(b => b.classList.remove('activo'));
-            boton.classList.add('activo');
-
-            // Cerrar el dropdown
-            generosDropdownSeries.classList.remove('active');
-            btnAbrirGenerosSeries.classList.remove('active');
-        });
-    });
-}
-
-// Función para filtrar series por género
-async function filtrarPorGeneroSeries(genero, textoGenero) {
-    const todasLasSeries = secciones.series.peliculas;
-
-    let seriesFiltradas;
-
-    if (genero === 'todos') {
-        seriesFiltradas = todasLasSeries;
-        generoActualTextoSeries.textContent = 'Todas las Series';
     } else {
-        seriesFiltradas = todasLasSeries.filter(serie => {
-            if (!serie.genero) return false;
-            // Verificar si el género está en la lista (para series con múltiples géneros)
-            const generos = serie.genero.split(',').map(g => g.trim());
+        contenidoFiltrado = contenidoCompleto.filter(item => {
+            if (!item.genero) return false;
+            const generos = item.genero.split(',').map(g => g.trim());
             return generos.includes(genero);
         });
-        generoActualTextoSeries.textContent = textoGenero;
+        botonTexto.textContent = textoGenero;
     }
 
-    // Regenerar el carrusel con las series filtradas
-    await generarImagenesPrincipales(seriesFiltradas, 'mainMovie-series');
-    generarMiniaturas(seriesFiltradas, 'bar-series', 'series');
+    // Regenerar carrusel
+    await generarImagenesPrincipales(contenidoFiltrado, `mainMovie-${seccion}`);
+    generarMiniaturas(contenidoFiltrado, `bar-${seccion}`, seccion);
 
-    // Mostrar la primera serie
+    // Mostrar primera película/serie
     setTimeout(() => {
-        cambiarImagenPrincipal(0, 'series');
+        cambiarImagenPrincipal(0, seccion);
     }, 100);
 }
+
+// ====================================
+// REPRODUCTOR DE VIDEO (YouTube) CON CONTROLES PERSONALIZADOS
+// ====================================
+
+let playerYT = null;
+let intervaloActualizacion = null;
+const modalReproductor = document.getElementById('modal-reproductor');
+const btnCerrarReproductor = document.getElementById('btn-cerrar-reproductor');
+const controlesOverlay = document.getElementById('controles-overlay');
+const btnPlayCentral = document.getElementById('btn-play-central');
+const btnPlayPause = document.getElementById('btn-play-pause');
+const btnVolume = document.getElementById('btn-volume');
+const volumeRange = document.getElementById('volume-range');
+const btnFullscreen = document.getElementById('btn-fullscreen');
+const progressBar = document.getElementById('progress-bar');
+const progressFilled = document.getElementById('progress-filled');
+const tiempoActual = document.getElementById('tiempo-actual');
+const tiempoTotal = document.getElementById('tiempo-total');
+
+// Cargar API de YouTube
+function cargarAPIYouTube() {
+    if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+}
+
+// Función que se ejecuta cuando la API de YouTube está lista
+window.onYouTubeIframeAPIReady = function() {
+    console.log('✅ API de YouTube cargada');
+};
+
+// Extraer ID de video de YouTube desde URL
+function extraerVideoIdYouTube(url) {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[7].length === 11) ? match[7] : null;
+}
+
+// Formatear tiempo (segundos a MM:SS)
+function formatearTiempo(segundos) {
+    const mins = Math.floor(segundos / 60);
+    const secs = Math.floor(segundos % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+// Actualizar barra de progreso
+function actualizarProgreso() {
+    if (!playerYT || typeof playerYT.getCurrentTime !== 'function') return;
+
+    const tiempoActualSeg = playerYT.getCurrentTime();
+    const duracionSeg = playerYT.getDuration();
+
+    if (duracionSeg) {
+        const porcentaje = (tiempoActualSeg / duracionSeg) * 100;
+        progressFilled.style.width = porcentaje + '%';
+        tiempoActual.textContent = formatearTiempo(tiempoActualSeg);
+        tiempoTotal.textContent = formatearTiempo(duracionSeg);
+    }
+}
+
+// Ocultar elementos de marca de YouTube
+function ocultarElementosYouTube() {
+    // Intentar acceder al iframe del reproductor
+    try {
+        const playerFrame = document.getElementById('player-youtube');
+
+        if (playerFrame) {
+            // Agregar estilos directamente al iframe para ocultar elementos
+            const style = document.createElement('style');
+            style.textContent = `
+                .ytp-chrome-top,
+                .ytp-show-cards-title,
+                .ytp-title,
+                .ytp-title-text,
+                .ytp-title-link,
+                .ytp-title-channel,
+                .ytp-watermark,
+                .ytp-gradient-top,
+                .ytp-cards-button,
+                .ytp-cards-teaser,
+                .ytp-ce-element,
+                .ytp-pause-overlay,
+                .ytp-suggested-action,
+                .iv-branding,
+                .branding-img,
+                .annotation,
+                .ytp-chrome-top-buttons {
+                    display: none !important;
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                }
+            `;
+
+            // Intentar aplicar el estilo en el documento principal
+            if (!document.getElementById('youtube-hide-style')) {
+                style.id = 'youtube-hide-style';
+                document.head.appendChild(style);
+            }
+        }
+    } catch (error) {
+        // Los iframes de dominios diferentes bloquean el acceso por seguridad
+        console.log('No se puede acceder al contenido del iframe de YouTube por políticas de seguridad');
+    }
+}
+
+// Abrir reproductor con video de YouTube
+function abrirReproductor(videoUrl) {
+    const videoId = extraerVideoIdYouTube(videoUrl);
+
+    if (!videoId) {
+        alert('❌ URL de YouTube no válida');
+        return;
+    }
+
+    modalReproductor.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    if (playerYT) {
+        playerYT.loadVideoById(videoId);
+    } else {
+        playerYT = new YT.Player('player-youtube', {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+                autoplay: 1,
+                controls: 0,
+                modestbranding: 1,
+                rel: 0,
+                fs: 0,
+                disablekb: 1,
+                iv_load_policy: 3,
+                showinfo: 0,
+                autohide: 1,
+                playsinline: 1,
+                cc_load_policy: 0,
+                color: 'white'
+            },
+            events: {
+                onReady: function(event) {
+                    event.target.playVideo();
+                    btnPlayCentral.classList.add('playing');
+                    actualizarIconoPlay(true);
+                    iniciarActualizacionProgreso();
+
+                    // Ocultar elementos de marca de YouTube después de cargar
+                    ocultarElementosYouTube();
+                },
+                onStateChange: function(event) {
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        btnPlayCentral.classList.add('playing');
+                        actualizarIconoPlay(true);
+                        iniciarActualizacionProgreso();
+
+                        // Asegurar que los elementos permanezcan ocultos al reproducir
+                        ocultarElementosYouTube();
+                    } else if (event.data === YT.PlayerState.PAUSED) {
+                        btnPlayCentral.classList.remove('playing');
+                        actualizarIconoPlay(false);
+                        detenerActualizacionProgreso();
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Actualizar icono de play/pause
+function actualizarIconoPlay(estaReproduciendo) {
+    const iconoPlayPause = btnPlayPause.querySelector('i');
+    const iconoPlayCentral = btnPlayCentral.querySelector('i');
+
+    if (estaReproduciendo) {
+        iconoPlayPause.className = 'bi bi-pause-fill';
+        iconoPlayCentral.className = 'bi bi-pause-fill';
+    } else {
+        iconoPlayPause.className = 'bi bi-play-fill';
+        iconoPlayCentral.className = 'bi bi-play-fill';
+    }
+}
+
+// Iniciar actualización de progreso
+function iniciarActualizacionProgreso() {
+    detenerActualizacionProgreso();
+    intervaloActualizacion = setInterval(actualizarProgreso, 100);
+}
+
+// Detener actualización de progreso
+function detenerActualizacionProgreso() {
+    if (intervaloActualizacion) {
+        clearInterval(intervaloActualizacion);
+        intervaloActualizacion = null;
+    }
+}
+
+// Cerrar reproductor
+function cerrarReproductor() {
+    modalReproductor.classList.remove('active');
+    document.body.style.overflow = '';
+    detenerActualizacionProgreso();
+
+    if (playerYT) {
+        playerYT.pauseVideo();
+    }
+
+    btnPlayCentral.classList.remove('playing');
+    progressFilled.style.width = '0%';
+}
+
+// Eventos de controles personalizados
+
+// Play/Pause (botón central)
+btnPlayCentral.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!playerYT) return;
+
+    const estado = playerYT.getPlayerState();
+    if (estado === YT.PlayerState.PLAYING) {
+        playerYT.pauseVideo();
+    } else {
+        playerYT.playVideo();
+    }
+});
+
+// Play/Pause (botón inferior)
+btnPlayPause.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!playerYT) return;
+
+    const estado = playerYT.getPlayerState();
+    if (estado === YT.PlayerState.PLAYING) {
+        playerYT.pauseVideo();
+    } else {
+        playerYT.playVideo();
+    }
+});
+
+// Control de volumen
+volumeRange.addEventListener('input', (e) => {
+    if (!playerYT) return;
+    playerYT.setVolume(e.target.value);
+    actualizarIconoVolumen(e.target.value);
+});
+
+function actualizarIconoVolumen(volumen) {
+    const icono = btnVolume.querySelector('i');
+    if (volumen == 0) {
+        icono.className = 'bi bi-volume-mute-fill';
+    } else if (volumen < 50) {
+        icono.className = 'bi bi-volume-down-fill';
+    } else {
+        icono.className = 'bi bi-volume-up-fill';
+    }
+}
+
+// Mute/Unmute al click en icono de volumen
+btnVolume.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!playerYT) return;
+
+    if (playerYT.isMuted()) {
+        playerYT.unMute();
+        volumeRange.value = playerYT.getVolume();
+        actualizarIconoVolumen(volumeRange.value);
+    } else {
+        playerYT.mute();
+        actualizarIconoVolumen(0);
+    }
+});
+
+// Fullscreen
+btnFullscreen.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const container = document.querySelector('.reproductor-wrapper');
+
+    if (!document.fullscreenElement) {
+        container.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+});
+
+// Barra de progreso - Seek
+progressBar.addEventListener('click', (e) => {
+    if (!playerYT) return;
+
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const porcentaje = clickX / rect.width;
+    const duracion = playerYT.getDuration();
+    const nuevoTiempo = duracion * porcentaje;
+
+    playerYT.seekTo(nuevoTiempo);
+});
+
+// Mostrar/ocultar controles al mover el mouse
+let timeoutControles;
+let timeoutOcultarControles;
+
+function mostrarControles() {
+    controlesOverlay.classList.add('mostrar');
+    btnCerrarReproductor.classList.add('mostrar');
+    reproductorContent.style.cursor = 'default';
+
+    // Limpiar timeouts anteriores
+    clearTimeout(timeoutControles);
+    clearTimeout(timeoutOcultarControles);
+
+    // Ocultar controles después de 3 segundos de inactividad
+    timeoutOcultarControles = setTimeout(() => {
+        if (playerYT && playerYT.getPlayerState() === YT.PlayerState.PLAYING) {
+            controlesOverlay.classList.remove('mostrar');
+            btnCerrarReproductor.classList.remove('mostrar');
+            reproductorContent.style.cursor = 'none';
+        }
+    }, 3000);
+}
+
+function ocultarControlesInmediato() {
+    clearTimeout(timeoutControles);
+    clearTimeout(timeoutOcultarControles);
+    if (playerYT && playerYT.getPlayerState() === YT.PlayerState.PLAYING) {
+        controlesOverlay.classList.remove('mostrar');
+        btnCerrarReproductor.classList.remove('mostrar');
+        reproductorContent.style.cursor = 'none';
+    }
+}
+
+// Mostrar controles al mover el mouse dentro del reproductor
+const reproductorContent = document.querySelector('.reproductor-content');
+
+reproductorContent.addEventListener('mousemove', mostrarControles);
+reproductorContent.addEventListener('mouseenter', mostrarControles);
+reproductorContent.addEventListener('mouseleave', () => {
+    clearTimeout(timeoutControles);
+    clearTimeout(timeoutOcultarControles);
+    timeoutControles = setTimeout(ocultarControlesInmediato, 500);
+});
+
+// Eventos para cerrar reproductor
+btnCerrarReproductor.addEventListener('click', cerrarReproductor);
+document.querySelector('.reproductor-overlay').addEventListener('click', cerrarReproductor);
+
+document.addEventListener('keydown', (e) => {
+    if (modalReproductor.classList.contains('active')) {
+        if (e.key === 'Escape') {
+            cerrarReproductor();
+        } else if (e.key === ' ') {
+            e.preventDefault();
+            if (playerYT) {
+                const estado = playerYT.getPlayerState();
+                if (estado === YT.PlayerState.PLAYING) {
+                    playerYT.pauseVideo();
+                } else {
+                    playerYT.playVideo();
+                }
+            }
+        }
+    }
+});
+
+// Cargar API de YouTube al iniciar
+cargarAPIYouTube();

@@ -112,6 +112,12 @@ document.querySelectorAll('.sidebar ul li a[data-seccion]').forEach(link => {
             if (seccionId === 'usuarios') {
                 cargarUsuarios();
             }
+
+            // Si es "Plan Premium", cargar configuración y estadísticas
+            if (seccionId === 'plan-premium') {
+                cargarConfiguracionPlan();
+                cargarEstadisticasPremium();
+            }
         }
     });
 });
@@ -197,7 +203,8 @@ document.getElementById('form-agregar').addEventListener('submit', async (e) => 
         contenido_url: formData.get('contenido_url') || null,
         anio: formData.get('anio') ? parseInt(formData.get('anio')) : null,
         id_genero: formData.get('id_genero') ? parseInt(formData.get('id_genero')) : null,
-        id_seriepeli: formData.get('id_seriepeli') ? parseInt(formData.get('id_seriepeli')) : null
+        id_seriepeli: formData.get('id_seriepeli') ? parseInt(formData.get('id_seriepeli')) : null,
+        premium: document.getElementById('check-premium').checked
     };
 
     try {
@@ -208,9 +215,9 @@ document.getElementById('form-agregar').addEventListener('submit', async (e) => 
             },
             body: JSON.stringify(pelicula)
         });
-        
+
         const datos = await respuesta.json();
-        
+
         if (datos.success) {
             alert('✅ Película agregada exitosamente');
             e.target.reset();
@@ -235,12 +242,12 @@ function cancelarAgregar() {
 async function editarPelicula(id) {
     try {
         const pelicula = peliculasOriginales.find(p => p.id_pelicula === id);
-        
+
         if (!pelicula) {
             alert('Película no encontrada');
             return;
         }
-        
+
         // Llenar el formulario del modal
         document.getElementById('edit-id').value = pelicula.id_pelicula;
         document.getElementById('edit-titulo').value = pelicula.titulo;
@@ -251,10 +258,11 @@ async function editarPelicula(id) {
         document.getElementById('edit-anio').value = pelicula.anio || '';
         document.getElementById('edit-genero').value = pelicula.id_genero || '';
         document.getElementById('edit-tipo').value = pelicula.id_seriepeli || '';
-        
+        document.getElementById('edit-premium').checked = pelicula.premium || false;
+
         // Mostrar modal
         document.getElementById('modal-editar').classList.add('activo');
-        
+
     } catch (error) {
         console.error('❌ Error al cargar película:', error);
         alert('Error al cargar los datos de la película');
@@ -274,9 +282,10 @@ document.getElementById('form-editar').addEventListener('submit', async (e) => {
         contenido_url: formData.get('contenido_url') || null,
         anio: formData.get('anio') ? parseInt(formData.get('anio')) : null,
         id_genero: formData.get('id_genero') ? parseInt(formData.get('id_genero')) : null,
-        id_seriepeli: formData.get('id_seriepeli') ? parseInt(formData.get('id_seriepeli')) : null
+        id_seriepeli: formData.get('id_seriepeli') ? parseInt(formData.get('id_seriepeli')) : null,
+        premium: document.getElementById('edit-premium').checked
     };
-    
+
     try {
         const respuesta = await fetch(`${API_URL}/${id}`, {
             method: 'PUT',
@@ -285,9 +294,9 @@ document.getElementById('form-editar').addEventListener('submit', async (e) => {
             },
             body: JSON.stringify(pelicula)
         });
-        
+
         const datos = await respuesta.json();
-        
+
         if (datos.success) {
             alert('✅ Película actualizada exitosamente');
             cerrarModal();
@@ -467,5 +476,150 @@ if (inputBuscarUsuarios) {
         });
 
         mostrarUsuarios(usuariosFiltrados);
+    });
+}
+
+// ====================================
+// GESTIÓN DEL PLAN PREMIUM
+// ====================================
+
+const API_PLANES = 'http://localhost:3000/api/planes';
+const API_SUSCRIPCIONES = 'http://localhost:3000/api/suscripciones';
+
+// Cargar configuración del plan premium
+async function cargarConfiguracionPlan() {
+    try {
+        const respuesta = await fetch(`${API_PLANES}/2`); // ID 2 es el Plan Premium
+        const datos = await respuesta.json();
+
+        if (datos.success) {
+            const plan = datos.plan;
+            document.getElementById('plan-nombre').value = plan.nombre;
+            document.getElementById('plan-precio').value = plan.precio;
+            document.getElementById('plan-descripcion').value = plan.descripcion;
+
+            // Convertir array de características a texto (una por línea)
+            if (plan.caracteristicas && Array.isArray(plan.caracteristicas)) {
+                document.getElementById('plan-caracteristicas').value = plan.caracteristicas.join('\n');
+            }
+        }
+    } catch (error) {
+        console.error('Error al cargar configuración del plan:', error);
+    }
+}
+
+// Guardar configuración del plan premium
+const formPlanPremium = document.getElementById('form-plan-premium');
+if (formPlanPremium) {
+    formPlanPremium.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nombre = document.getElementById('plan-nombre').value;
+        const precio = parseFloat(document.getElementById('plan-precio').value);
+        const descripcion = document.getElementById('plan-descripcion').value;
+        const caracteristicasTexto = document.getElementById('plan-caracteristicas').value;
+
+        // Convertir texto a array (separar por líneas)
+        const caracteristicas = caracteristicasTexto
+            .split('\n')
+            .map(c => c.trim())
+            .filter(c => c.length > 0);
+
+        try {
+            const respuesta = await fetch(`${API_PLANES}/2`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre,
+                    precio,
+                    descripcion,
+                    caracteristicas
+                })
+            });
+
+            const datos = await respuesta.json();
+
+            if (datos.success) {
+                alert('Configuración del plan actualizada exitosamente');
+                await cargarEstadisticasPremium();
+            } else {
+                alert('Error: ' + datos.mensaje);
+            }
+        } catch (error) {
+            console.error('Error al guardar configuración:', error);
+            alert('Error al actualizar la configuración del plan');
+        }
+    });
+}
+
+// Cargar estadísticas del plan premium
+async function cargarEstadisticasPremium() {
+    try {
+        // Obtener total de usuarios premium
+        const respuestaSuscripciones = await fetch(`${API_SUSCRIPCIONES}/activas`);
+        const datosSuscripciones = await respuestaSuscripciones.json();
+
+        if (datosSuscripciones.success) {
+            const suscripcionesActivas = datosSuscripciones.suscripciones;
+            const totalUsuariosPremium = suscripcionesActivas.length;
+
+            // Actualizar contador de usuarios premium
+            document.getElementById('total-usuarios-premium').textContent = totalUsuariosPremium;
+            document.getElementById('suscripciones-activas').textContent = totalUsuariosPremium;
+
+            // Calcular ingresos mensuales
+            const respuestaPlan = await fetch(`${API_PLANES}/2`);
+            const datosPlan = await respuestaPlan.json();
+
+            if (datosPlan.success) {
+                const precioPlan = datosPlan.plan.precio;
+                const ingresosMensuales = totalUsuariosPremium * precioPlan;
+                document.getElementById('ingresos-mensuales').textContent = `$${ingresosMensuales.toFixed(2)}`;
+            }
+
+            // Mostrar usuarios premium en la tabla
+            mostrarUsuariosPremium(suscripcionesActivas);
+        }
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+    }
+}
+
+// Mostrar usuarios premium en la tabla
+function mostrarUsuariosPremium(suscripciones) {
+    const tbody = document.getElementById('tbody-usuarios-premium');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (suscripciones.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay usuarios premium activos</td></tr>';
+        return;
+    }
+
+    suscripciones.forEach(sub => {
+        const tr = document.createElement('tr');
+
+        const fechaInicio = new Date(sub.fecha_inicio).toLocaleDateString('es-MX');
+        const fechaFin = new Date(sub.fecha_vencimiento).toLocaleDateString('es-MX');
+        const estadoBadge = sub.estado === 'activo'
+            ? '<span class="badge-activo">Activo</span>'
+            : '<span class="badge-inactivo">Inactivo</span>';
+        const autoRenovacion = sub.auto_renovacion
+            ? '<span class="badge-si">Sí</span>'
+            : '<span class="badge-no">No</span>';
+
+        tr.innerHTML = `
+            <td>${sub.nombre_usuario || 'N/A'}</td>
+            <td>${sub.email || 'N/A'}</td>
+            <td>${fechaInicio}</td>
+            <td>${fechaFin}</td>
+            <td>${estadoBadge}</td>
+            <td>${autoRenovacion}</td>
+        `;
+
+        tbody.appendChild(tr);
     });
 }

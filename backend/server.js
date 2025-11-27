@@ -7,11 +7,21 @@ dotenv.config({ path: './.env' });
 // Importar la conexión a la base de datos
 const pool = require('./config/database');
 
+// Importar rutas de membresías y pagos
+const planesRoutes = require('./routes/planes');
+const suscripcionesRoutes = require('./routes/suscripciones');
+const metodosPagoRoutes = require('./routes/metodosPago');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Rutas de membresías y pagos
+app.use('/api/planes', planesRoutes);
+app.use('/api/suscripciones', suscripcionesRoutes);
+app.use('/api/metodos-pago', metodosPagoRoutes);
 
 app.get('/', (req, res) => {
     res.json({ 
@@ -107,7 +117,7 @@ app.get('/api/peliculas/tipo/:id', async (req, res) => {
 // Ruta para AGREGAR una película nueva
 app.post('/api/peliculas', async (req, res) => {
     try {
-        const { titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli } = req.body;
+        const { titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli, premium } = req.body;
 
         // Validar que vengan los datos obligatorios
         if (!titulo || !director || !sinopsis) {
@@ -119,10 +129,10 @@ app.post('/api/peliculas', async (req, res) => {
 
         // Insertar en la base de datos
         const resultado = await pool.query(
-            'INSERT INTO contenido.tpeliculas (titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli]
+            'INSERT INTO contenido.tpeliculas (titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli, premium) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+            [titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli, premium || false]
         );
-        
+
         res.json({
             success: true,
             mensaje: 'Película agregada exitosamente',
@@ -141,21 +151,21 @@ app.post('/api/peliculas', async (req, res) => {
 app.put('/api/peliculas/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli } = req.body;
+        const { titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli, premium } = req.body;
 
         // Actualizar en la base de datos
         const resultado = await pool.query(
-            'UPDATE contenido.tpeliculas SET titulo = $1, director = $2, sinopsis = $3, imagen_url = $4, contenido_url = $5, anio = $6, id_genero = $7, id_seriepeli = $8 WHERE id_pelicula = $9 RETURNING *',
-            [titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli, id]
+            'UPDATE contenido.tpeliculas SET titulo = $1, director = $2, sinopsis = $3, imagen_url = $4, contenido_url = $5, anio = $6, id_genero = $7, id_seriepeli = $8, premium = $9 WHERE id_pelicula = $10 RETURNING *',
+            [titulo, director, sinopsis, imagen_url, contenido_url, anio, id_genero, id_seriepeli, premium || false, id]
         );
-        
+
         if (resultado.rows.length === 0) {
             return res.status(404).json({
                 success: false,
                 mensaje: 'Película no encontrada'
             });
         }
-        
+
         res.json({
             success: true,
             mensaje: 'Película actualizada exitosamente',

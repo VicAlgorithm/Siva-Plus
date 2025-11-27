@@ -277,7 +277,7 @@ body {
 }
 
 .modal-contenido {
-    background: white;
+    background: rgba(1, 1, 1, 0.397);
     padding: 30px;
     border-radius: 15px;
     max-width: 600px;
@@ -304,7 +304,7 @@ body {
 
 .modal-contenido h2 {
     margin-bottom: 20px;
-    color: #333;
+    color: green
 }
 
 
@@ -506,4 +506,157 @@ body {
     font-size: 14px;
     color: #333;
     font-weight: 500;
+}
+
+/* Estilos para el checkbox de Premium */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 12px;
+    background: rgba(255, 187, 0, 0.1);
+    border: 2px solid rgba(255, 187, 0, 0.3);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label:hover {
+    background: rgba(255, 187, 0, 0.2);
+    border-color: rgb(255, 187, 0);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: rgb(7, 136, 39);
+}
+
+.checkbox-label span {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* ====================================
+   ESTILOS PARA SECCIÓN PLAN PREMIUM
+   ==================================== */
+
+/* Estadísticas */
+.premium-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgb(7, 136, 39), rgb(5, 110, 31));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: white;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Configuración del Plan */
+.premium-config {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.premium-config h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 22px;
+    border-bottom: 2px solid rgb(7, 136, 39);
+    padding-bottom: 10px;
+}
+
+/* Lista de Usuarios Premium */
+.premium-users {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.premium-users h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 22px;
+    border-bottom: 2px solid rgb(7, 136, 39);
+    padding-bottom: 10px;
+}
+
+/* Badges para tabla de usuarios premium */
+.badge-activo,
+.badge-inactivo,
+.badge-si,
+.badge-no {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-activo {
+    background: rgba(7, 136, 39, 0.15);
+    color: rgb(7, 136, 39);
+}
+
+.badge-inactivo {
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff4444;
+}
+
+.badge-si {
+    background: rgba(7, 136, 39, 0.15);
+    color: rgb(7, 136, 39);
+}
+
+.badge-no {
+    background: rgba(128, 128, 128, 0.15);
+    color: #666;
 }

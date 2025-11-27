@@ -4,6 +4,7 @@
     <head>
         <title>SIVA+</title>
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/planes.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     </head>
 
@@ -244,9 +245,9 @@
                     </div>
                 </div>
                 <ul class="user-menu">
-                    <li><a href="#"><i class="bi bi-person"></i> Perfil</a></li>
-                    <li><a href="#"><i class="bi bi-star"></i> Plan</a></li>
-                    <li><a href="#"><i class="bi bi-credit-card"></i> Métodos de Pago</a></li>
+                    <li><a href="#" id="btn-perfil"><i class="bi bi-person"></i> Perfil</a></li>
+                    <li><a href="#" id="btn-plan"><i class="bi bi-star"></i> Plan</a></li>
+                    <li><a href="#" id="btn-metodos-pago"><i class="bi bi-credit-card"></i> Métodos de Pago</a></li>
                     <li><a href="#" id="btn-logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
                 </ul>
             </div>
@@ -263,7 +264,162 @@
             </div>
         </div>
 
+        <!-- Modal Reproductor de Video -->
+        <div id="modal-reproductor" class="modal-reproductor">
+            <div class="reproductor-overlay"></div>
+            <div class="reproductor-container">
+                <div class="reproductor-wrapper">
+                    <button class="btn-cerrar-reproductor" id="btn-cerrar-reproductor">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <div class="reproductor-content">
+                        <div id="player-youtube"></div>
+
+                        <!-- Overlay con controles personalizados -->
+                        <div class="controles-overlay" id="controles-overlay">
+                            <!-- Botón play/pause central -->
+                            <button class="btn-play-central" id="btn-play-central">
+                                <i class="bi bi-play-fill"></i>
+                            </button>
+
+                            <!-- Controles inferiores -->
+                            <div class="controles-inferiores">
+                                <!-- Barra de progreso -->
+                                <div class="progress-container">
+                                    <div class="progress-bar" id="progress-bar">
+                                        <div class="progress-filled" id="progress-filled"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Botones de control -->
+                                <div class="controles-botones">
+                                    <div class="controles-izquierda">
+                                        <button class="control-btn" id="btn-play-pause">
+                                            <i class="bi bi-play-fill"></i>
+                                        </button>
+                                        <button class="control-btn" id="btn-volume">
+                                            <i class="bi bi-volume-up-fill"></i>
+                                        </button>
+                                        <div class="volume-slider">
+                                            <input type="range" id="volume-range" min="0" max="100" value="100">
+                                        </div>
+                                        <span class="tiempo-actual" id="tiempo-actual">0:00</span>
+                                        <span class="separador-tiempo">/</span>
+                                        <span class="tiempo-total" id="tiempo-total">0:00</span>
+                                    </div>
+                                    <div class="controles-derecha">
+                                        <button class="control-btn" id="btn-fullscreen">
+                                            <i class="bi bi-arrows-fullscreen"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL DE PLANES Y SUSCRIPCIONES -->
+        <div id="modal-planes" class="modal-overlay">
+            <div class="modal-planes-container">
+                <button class="modal-close" id="btn-cerrar-planes">&times;</button>
+
+                <div id="seccion-suscripcion-activa" style="display: none;">
+                    <h2>Tu Suscripción Activa</h2>
+                    <div class="suscripcion-info">
+                        <div class="plan-badge">
+                            <i class="bi bi-star-fill"></i>
+                            <span id="plan-nombre-actual">Plan Básico</span>
+                        </div>
+                        <div class="detalles-suscripcion">
+                            <p><strong>Fecha de inicio:</strong> <span id="fecha-inicio">--</span></p>
+                            <p><strong>Fecha de vencimiento:</strong> <span id="fecha-fin">--</span></p>
+                            <p><strong>Días restantes:</strong> <span id="dias-restantes">--</span></p>
+                            <p><strong>Precio:</strong> $<span id="precio-actual">--</span>/mes</p>
+                        </div>
+                        <div class="caracteristicas-plan" id="caracteristicas-actuales">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                        <div class="acciones-suscripcion">
+                            <label class="switch-renovacion">
+                                <input type="checkbox" id="toggle-auto-renovacion">
+                                <span class="slider-renovacion"></span>
+                                <span class="label-renovacion">Auto-renovación</span>
+                            </label>
+                            <button class="btn-cancelar-suscripcion" id="btn-cancelar-suscripcion">
+                                <i class="bi bi-x-circle"></i> Cancelar Suscripción
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="seccion-seleccionar-plan">
+                    <h2>Elige tu Plan</h2>
+                    <p class="subtitulo-planes">Selecciona el plan que mejor se adapte a tus necesidades</p>
+                    <div class="planes-grid" id="planes-grid">
+                        <!-- Los planes se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL DE MÉTODOS DE PAGO -->
+        <div id="modal-metodos-pago" class="modal-overlay">
+            <div class="modal-metodos-container">
+                <button class="modal-close" id="btn-cerrar-metodos">&times;</button>
+                <h2>Métodos de Pago</h2>
+
+                <div class="metodos-lista" id="metodos-lista">
+                    <!-- Los métodos de pago se cargarán dinámicamente -->
+                </div>
+
+                <button class="btn-agregar-metodo" id="btn-agregar-metodo">
+                    <i class="bi bi-plus-circle"></i> Agregar Método de Pago
+                </button>
+
+                <!-- Formulario para agregar método de pago -->
+                <div id="formulario-metodo-pago" class="formulario-metodo-pago" style="display: none;">
+                    <h3>Nuevo Método de Pago</h3>
+                    <form id="form-agregar-metodo">
+                        <div class="form-group">
+                            <label>Tipo de Pago</label>
+                            <select id="tipo-pago" required>
+                                <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                                <option value="tarjeta_debito">Tarjeta de Débito</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="transferencia">Transferencia Bancaria</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Titular</label>
+                            <input type="text" id="nombre-titular" placeholder="Nombre completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Últimos 4 Dígitos</label>
+                            <input type="text" id="ultimos-digitos" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de Expiración</label>
+                            <input type="month" id="fecha-expiracion">
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="es-principal-nuevo">
+                                Establecer como método principal
+                            </label>
+                        </div>
+                        <div class="botones-metodo">
+                            <button type="submit" class="btn-guardar-metodo">Guardar</button>
+                            <button type="button" class="btn-cancelar-metodo" id="btn-cancelar-form-metodo">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <script src="scripts/inicio.js"></script>
+        <script src="scripts/planes.js"></script>
     </body>
 
 
